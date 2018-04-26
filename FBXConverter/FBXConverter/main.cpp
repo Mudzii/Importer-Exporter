@@ -5,15 +5,15 @@
 #include <sstream>
 #include <vector>
 #include <stdio.h>
-//#include <fbxsdk.h>
+#include <fbxsdk.h>
 #include <algorithm>
 
 #include <Importer\ImporterFormat.h>
 #pragma comment(lib, "Importer.lib")
-//#pragma comment(lib, "libfbxsdk-md.lib")
+#pragma comment(lib, "libfbxsdk-md.lib")
 
 using namespace std;
-/*
+
 // =====================================================================
 
 FbxAMatrix getGeometryTransformation(FbxNode* lNode);
@@ -449,7 +449,7 @@ void ProcessSkeletonRecursively(FbxNode * pNode, int pParentIndex, std::vector<M
 		pSkeleton.push_back(currentJoint);
 		/*std::cout << "Joint: " << currentJoint.name << " | Parent: " << std::to_string(currentJoint.parentIndex)
 		<< " | Myself: " << std::to_string(currentJoint.index) << std::endl;*/
-	/* }
+	 }
 	for (int i = 0; i < pNode->GetChildCount(); i++)
 	{
 		ProcessSkeletonRecursively(pNode->GetChild(i), pSkeleton.size() - 1, pSkeleton);
@@ -486,7 +486,8 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 }
 
 // =====================================================================
-*/ 
+
+
 int main(int argc, char** argv)
 {
 	/*
@@ -509,96 +510,96 @@ int main(int argc, char** argv)
 
 	CustomFileLoader importr;
 	GRP4Header header;
-/*
-	const char* fileName = "run.fbx";
-	const char* filePath = "Materials/run.fbx";
-	const char* newName = "run.vkp";
 
-	bool isTriangulated = true;*/
+	const char* fileName = "drawBow.fbx";
+	const char* filePath = "Materials/drawBow.fbx";
+	const char* newName = "drawBow.vkp";
+
+	bool isTriangulated = true;
 
 	//import.Loader("example.test");
 	//int i = import.getMeshCount(); 
 	//std::cout << "Meshcount: " << i << std::endl; 
 	//std::cout << "Skeleton count: " << import.getSkeletonCount() << std::endl; 
 
-	//FbxManager* lSDKManager = FbxManager::Create();
+	FbxManager* lSDKManager = FbxManager::Create();
 
-	//FbxIOSettings *ios = FbxIOSettings::Create(lSDKManager, IOSROOT);
-	//lSDKManager->SetIOSettings(ios);
+	FbxIOSettings *ios = FbxIOSettings::Create(lSDKManager, IOSROOT);
+	lSDKManager->SetIOSettings(ios);
 
-	//// Create an importer using the SDK manager.
-	//FbxImporter* lImporter = FbxImporter::Create(lSDKManager, "");
+	// Create an importer using the SDK manager.
+	FbxImporter* lImporter = FbxImporter::Create(lSDKManager, "");
 
-	//// Use the first argument as the filename for the importer.
-	//if (!lImporter->Initialize(filePath, -1, lSDKManager->GetIOSettings())) {
+	// Use the first argument as the filename for the importer.
+	if (!lImporter->Initialize(filePath, -1, lSDKManager->GetIOSettings())) {
 
-	//	std::cout << "Call to FbxImporter::Initialize() failed" << std::endl;
-	//	exit(-1);
-	//}
+		std::cout << "Call to FbxImporter::Initialize() failed" << std::endl;
+		exit(-1);
+	}
 
-	//// Create a new scene so that it can be populated by the imported file.
-	//FbxScene* lScene = FbxScene::Create(lSDKManager, "myScene");
-	//// Import the contents of the file into the scene.
-	//lImporter->Import(lScene);
-	//// The file is imported, so get rid of the importer.
-	//lImporter->Destroy();
-
-
-	//if (isTriangulated == false) {
-
-	//	FbxGeometryConverter lGeomConverter(lSDKManager);
-	//	lGeomConverter.Triangulate(lScene, true, false);
-	//}
-
-	//// Find mesh vertices and print information about them
-	//// Get the scenes root node
-	//FbxNode* lRootNode = lScene->GetRootNode();
-
-	//// Use root node to find children
-	//FbxNode* lNode = lRootNode->GetChild(0);
-	//int childCount = lRootNode->GetChildCount();
-
-	//if (lRootNode) {
-	//	for (int i = 0; i < childCount; i++) {
-
-	//		FbxNode* lNode = lRootNode->GetChild(i);
-	//		FbxNodeAttribute * nodeAttribute = lNode->GetNodeAttribute();
-
-	//		if (nodeAttribute && nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
-	//		{
-	//			if (CheckIfNodeHasSkeleton(lNode->GetParent()))
-	//			{
-	//				std::cout << "Animated mesh" << std::endl;
-	//				animatedMesh(lNode, header, lScene, fileName);
-	//			}
-
-	//			else
-	//			{
-	//				std::cout << "Static mesh" << std::endl;
-	//				std::cout << std::endl;
-	//				staticMesh(lNode, header, fileName);
-	//			}
-	//		}
-	//	}
-
-	//}
+	// Create a new scene so that it can be populated by the imported file.
+	FbxScene* lScene = FbxScene::Create(lSDKManager, "myScene");
+	// Import the contents of the file into the scene.
+	lImporter->Import(lScene);
+	// The file is imported, so get rid of the importer.
+	lImporter->Destroy();
 
 
-	////if (isAnimated == true)
-	////	animatedMesh(lNode, header, lScene, fileName);
+	if (isTriangulated == false) {
 
-	////else
-	////	staticMesh(lNode, header, fileName);
+		FbxGeometryConverter lGeomConverter(lSDKManager);
+		lGeomConverter.Triangulate(lScene, true, false);
+	}
 
-	//importr.SaveToFile(newName, header);
+	// Find mesh vertices and print information about them
+	// Get the scenes root node
+	FbxNode* lRootNode = lScene->GetRootNode();
 
-	//std::cout << "File was saved" << std::endl;
+	// Use root node to find children
+	FbxNode* lNode = lRootNode->GetChild(0);
+	int childCount = lRootNode->GetChildCount();
 
-	//// Destroy the SDK manager and all the other objects it was handling.
-	//lSDKManager->Destroy();	struct VertexBlendingInfo {
-	//	float blendingWeight;
-	//	unsigned int blendingIndex;
-	//};
+	if (lRootNode) {
+		for (int i = 0; i < childCount; i++) {
+
+			FbxNode* lNode = lRootNode->GetChild(i);
+			FbxNodeAttribute * nodeAttribute = lNode->GetNodeAttribute();
+
+			if (nodeAttribute && nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
+			{
+				if (CheckIfNodeHasSkeleton(lNode->GetParent()))
+				{
+					std::cout << "Animated mesh" << std::endl;
+					animatedMesh(lNode, header, lScene, fileName);
+				}
+
+				else
+				{
+					std::cout << "Static mesh" << std::endl;
+					std::cout << std::endl;
+					staticMesh(lNode, header, fileName);
+				}
+			}
+		}
+
+	}
+
+
+	//if (isAnimated == true)
+	//	animatedMesh(lNode, header, lScene, fileName);
+
+	//else
+	//	staticMesh(lNode, header, fileName);
+
+	importr.SaveToFile(newName, header);
+
+	std::cout << "File was saved" << std::endl;
+
+	// Destroy the SDK manager and all the other objects it was handling.
+	lSDKManager->Destroy();	struct VertexBlendingInfo {
+		float blendingWeight;
+		unsigned int blendingIndex;
+	};
 
 
 	getchar();
