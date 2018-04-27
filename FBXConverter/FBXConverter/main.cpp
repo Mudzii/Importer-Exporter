@@ -496,17 +496,17 @@ int main(int argc, char** argv)
 	- freeze transformations on meshes
 
 	*/
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	//fprintf(stderr, "%d\n", argc);
-	//fprintf(stderr, "%s\n", argv[1]);
+	fprintf(stderr, "%d\n", argc);
+	fprintf(stderr, "%s\n", argv[0]);
 
 	//fprintf(stderr, "%s\n", strstr(argv[1], "_anim"));
 
 	//fprintf(stderr, "%s\n", argv[2]);
-	//getchar();
-	//return 0;
+	getchar();
+	return 0;
 
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	CustomFileLoader importr;
 	GRP4Header header;
