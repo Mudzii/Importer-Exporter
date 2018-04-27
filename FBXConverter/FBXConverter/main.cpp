@@ -488,7 +488,7 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char** argv)
+int main(int argc, char* argv[2])
 {
 	/*
 	BEFORE USING:
@@ -511,13 +511,21 @@ int main(int argc, char** argv)
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "drawBow.fbx";
-	const char* filePath = "Materials/drawBow.fbx";
-	const char* newName = "drawBow.vkp";
+	const char* fileName = argv[1];
+	const char* newName  = argv[2];
+	const char* filePath = argv[3];
 
 	bool isTriangulated = true;
+	int count = 0; 
 
-	fprintf(stderr, "%s\n", fileName);
+	std::cout << "\nCommand-line arguments:\n";
+	
+	for (count = 0; count < argc; count++) {
+
+		cout << "  argv[" << count << "]   "
+		<< argv[count] << "\n";
+	}
+
 
 	FbxManager* lSDKManager = FbxManager::Create();
 
@@ -531,6 +539,7 @@ int main(int argc, char** argv)
 	if (!lImporter->Initialize(filePath, -1, lSDKManager->GetIOSettings())) {
 
 		std::cout << "Call to FbxImporter::Initialize() failed" << std::endl;
+		std::cout << "Error " << lImporter->GetStatus().GetErrorString() << std::endl; 
 		exit(-1);
 	}
 
