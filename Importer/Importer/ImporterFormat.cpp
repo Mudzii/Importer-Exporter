@@ -216,7 +216,7 @@ void CustomFileLoader::SaveToFile(const char* fileName, GRP4Header &header) {
 
 int CustomFileLoader::LoadFromFile(const char* fileName, GRP4Header &header) {
 
-	int nrOfMeshes = -1;
+	int nrOfMeshes = 0;
 
 	//open filestream
 	std::ifstream inFile(fileName, std::ifstream::binary);
