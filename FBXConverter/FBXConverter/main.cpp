@@ -513,7 +513,7 @@ int main(int argc, char* argv[2])
 
 	const char* fileName = argv[1];
 	const char* newName  = argv[2];
-	const char* filePath = argv[3];
+	const char* filePath = "Materials/drawBow.fbx";
 
 	bool isTriangulated = true;
 	int count = 0; 
