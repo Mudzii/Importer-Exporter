@@ -488,8 +488,9 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
+
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	/*
 	BEFORE USING:
 	- remember to triangulate mesh
@@ -497,21 +498,10 @@ int main(int argc, char** argv)
 
 	*/
 
-	//fprintf(stderr, "%d\n", argc);
-	//fprintf(stderr, "%s\n", argv[1]);
-
-	//fprintf(stderr, "%s\n", strstr(argv[1], "_anim"));
-
-	//fprintf(stderr, "%s\n", argv[2]);
-	//getchar();
-	//return 0;
-
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
-
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "jumpStartLong.fbx";
+	const char* fileName = "jumpStartLong";
 	const char* filePath = "Materials/jumpStartLong.fbx";
 	const char* newName = "jumpStartLong.vkp";
 
