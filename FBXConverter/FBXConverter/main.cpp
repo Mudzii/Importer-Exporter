@@ -511,16 +511,11 @@ int main(int argc, char** argv)
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "drawBow.fbx";
-	const char* filePath = "Materials/drawBow.fbx";
-	const char* newName = "drawBow.vkp";
+	const char* fileName = "jumpStartLong.fbx";
+	const char* filePath = "Materials/jumpStartLong.fbx";
+	const char* newName = "jumpStartLong.vkp";
 
 	bool isTriangulated = true;
-
-	//import.Loader("example.test");
-	//int i = import.getMeshCount(); 
-	//std::cout << "Meshcount: " << i << std::endl; 
-	//std::cout << "Skeleton count: " << import.getSkeletonCount() << std::endl; 
 
 	FbxManager* lSDKManager = FbxManager::Create();
 
@@ -571,6 +566,8 @@ int main(int argc, char** argv)
 				{
 					std::cout << "Animated mesh" << std::endl;
 					animatedMesh(lNode, header, lScene, fileName);
+
+					std::cout << "Anim name: " << header.animatedMesh[0].animations[0].animationName << std::endl; 
 				}
 
 				else
@@ -584,12 +581,6 @@ int main(int argc, char** argv)
 
 	}
 
-
-	//if (isAnimated == true)
-	//	animatedMesh(lNode, header, lScene, fileName);
-
-	//else
-	//	staticMesh(lNode, header, fileName);
 
 	importr.SaveToFile(newName, header);
 
