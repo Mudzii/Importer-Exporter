@@ -498,24 +498,26 @@ int main(int argc, char** argv)
 	*/
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
-	fprintf(stderr, "%d\n", argc);
-	fprintf(stderr, "%s\n", argv[0]);
+	/*fprintf(stderr, "%d\n", argc);
+	fprintf(stderr, "%s\n", argv[0]);*/
 
 	//fprintf(stderr, "%s\n", strstr(argv[1], "_anim"));
 
 	//fprintf(stderr, "%s\n", argv[2]);
-	getchar();
-	return 0;
+	/*getchar();
+	return 0;*/
 
 
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "jumpStartLong.fbx";
-	const char* filePath = "Materials/jumpStartLong.fbx";
-	const char* newName = "jumpStartLong.vkp";
+	const char* fileName = "drawBow.fbx";
+	const char* filePath = "Materials/drawBow.fbx";
+	const char* newName = "drawBow.vkp";
 
 	bool isTriangulated = true;
+
+	fprintf(stderr, "%s\n", fileName);
 
 	FbxManager* lSDKManager = FbxManager::Create();
 
