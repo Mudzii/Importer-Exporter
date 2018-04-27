@@ -499,13 +499,14 @@ int main(int argc, char* argv[2])
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	/*fprintf(stderr, "%d\n", argc);
-	fprintf(stderr, "%s\n", argv[0]);*/
+	fprintf(stderr, "%s\n", argv[0]);
 
-	//fprintf(stderr, "%s\n", strstr(argv[1], "_anim"));
+	fprintf(stderr, "%s\n", strstr(argv[1], "_anim"));
 
-	//fprintf(stderr, "%s\n", argv[2]);
-	/*getchar();
-	return 0;*/
+	fprintf(stderr, "%s\n", argv[2]);
+	getchar();
+	return 0;
+	*/
 
 
 	CustomFileLoader importr;
@@ -513,7 +514,7 @@ int main(int argc, char* argv[2])
 
 	const char* fileName = argv[1];
 	const char* newName  = argv[2];	
-	const char* filePath = "Materials/drawBow.fbx";
+	const char* filePath = argv[3];
 
 	bool isTriangulated = true;
 	int count = 0; 
@@ -527,8 +528,12 @@ int main(int argc, char* argv[2])
 	}
 
 
+	// ==============================================
+
+	//create SDKManager
 	FbxManager* lSDKManager = FbxManager::Create();
 
+	//create IOSettings object
 	FbxIOSettings *ios = FbxIOSettings::Create(lSDKManager, IOSROOT);
 	lSDKManager->SetIOSettings(ios);
 
@@ -545,11 +550,12 @@ int main(int argc, char* argv[2])
 
 	// Create a new scene so that it can be populated by the imported file.
 	FbxScene* lScene = FbxScene::Create(lSDKManager, "myScene");
+
 	// Import the contents of the file into the scene.
 	lImporter->Import(lScene);
+
 	// The file is imported, so get rid of the importer.
 	lImporter->Destroy();
-
 
 	if (isTriangulated == false) {
 
@@ -578,7 +584,7 @@ int main(int argc, char* argv[2])
 					std::cout << "Animated mesh" << std::endl;
 					animatedMesh(lNode, header, lScene, fileName);
 
-					std::cout << "Anim name: " << header.animatedMesh[0].animations[0].animationName << std::endl; 
+					std::cout << "Animation name: " << header.animatedMesh[0].animations[0].animationName << std::endl; 
 				}
 
 				else
