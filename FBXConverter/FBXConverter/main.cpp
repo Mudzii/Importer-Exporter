@@ -488,7 +488,7 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char* argv[2])
+int main(int argc, char* argv[4])
 {
 	/*
 	BEFORE USING:
@@ -508,12 +508,17 @@ int main(int argc, char* argv[2])
 	return 0;
 	*/
 
+	if (argc < 4)
+	{
+		std::cout << fprintf(stderr, "Please enter executable, file name, new filename and filepath") << std::endl;
+		return 1;
+	}
 
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = argv[1];
-	const char* newName  = argv[2];	
+	const char* fileName = argv[1]; 
+	const char* newName  = argv[2];
 	const char* filePath = argv[3];
 
 	bool isTriangulated = true;
@@ -527,7 +532,9 @@ int main(int argc, char* argv[2])
 		<< argv[count] << "\n";
 	}
 
+	std::cout << fileName << std::endl; 
 
+	return 0; 
 	// ==============================================
 
 	//create SDKManager
