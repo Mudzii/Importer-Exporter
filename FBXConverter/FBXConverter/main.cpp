@@ -488,7 +488,7 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
 
 	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 	/*
@@ -501,9 +501,9 @@ int main(int argc, char** argv) {
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "jumpStartLong";
-	const char* filePath = "Materials/jumpStartLong.fbx";
-	const char* newName = "jumpStartLong.vkp";
+	const char* fileName = "barrel2.fbx";
+	const char* filePath = "Materials/barrel2.fbx";
+	const char* newName = "barrel.vkp"; 
 
 	bool isTriangulated = true;
 
@@ -519,6 +519,8 @@ int main(int argc, char** argv) {
 	if (!lImporter->Initialize(filePath, -1, lSDKManager->GetIOSettings())) {
 
 		std::cout << "Call to FbxImporter::Initialize() failed" << std::endl;
+		std::cout << lImporter->GetStatus().GetErrorString() << std::endl; 
+		getchar(); 
 		exit(-1);
 	}
 
