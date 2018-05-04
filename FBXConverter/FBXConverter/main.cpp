@@ -488,7 +488,7 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char* argv[4])
+int main(int argc, char* argv[3])
 {
 	/*
 	BEFORE USING:
@@ -508,8 +508,7 @@ int main(int argc, char* argv[4])
 	return 0;
 	*/
 
-	if (argc < 4)
-	{
+	if (argc < 3) {
 		std::cout << fprintf(stderr, "Please enter executable, file name, new filename and filepath") << std::endl;
 		return 1;
 	}
@@ -519,7 +518,7 @@ int main(int argc, char* argv[4])
 
 	const char* fileName = argv[1]; 
 	const char* newName  = argv[2];
-	const char* filePath = argv[3];
+	const char* filePath = argv[1];
 
 	bool isTriangulated = true;
 	int count = 0; 
@@ -532,9 +531,14 @@ int main(int argc, char* argv[4])
 		<< argv[count] << "\n";
 	}
 
+	std::cout << std::endl; 
 	std::cout << fileName << std::endl; 
+	std::cout << newName << std::endl;
+	std::cout << filePath << std::endl;
+	std::cout << std::endl;
 
-	return 0; 
+
+	//return 0; 
 	// ==============================================
 
 	//create SDKManager
