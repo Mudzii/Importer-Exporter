@@ -19,7 +19,7 @@ public:
 	std::vector<Animation> animations;
 	std::vector<std::vector<std::vector<Matrix4x4>>> keyframes;
 	std::vector<Matrix4x4> keyframesPackedData;
-	Material animatedMaterial;
+	//Material material;
 
 public:
 	AnimatedMesh(std::string animatedMeshName, int animatedMeshIndex, const std::vector<Mesh::AnimatedVertex>& vertices,

@@ -307,7 +307,7 @@ int CustomFileLoader::LoadFromFile(const char* fileName, GRP4Header &header) {
 
 			}
 		}
-		nrOfMeshes++; 
+		//nrOfMeshes++; 
 	}
 
 
