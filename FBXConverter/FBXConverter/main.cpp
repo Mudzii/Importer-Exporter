@@ -1,12 +1,15 @@
 #define _CRTDBG_MAP_ALLOC  
+
 #include <stdlib.h>  
 #include <crtdbg.h>
 #include <iostream>
 #include <sstream>
+#include <fstream>
 #include <vector>
 #include <stdio.h>
 #include <fbxsdk.h>
 #include <algorithm>
+#include <experimental/filesystem>
 
 #include <Importer\ImporterFormat.h>
 #pragma comment(lib, "Importer.lib")
@@ -14,13 +17,15 @@
 
 using namespace std;
 
+namespace fs = std::experimental::filesystem;
+
 // =====================================================================
 
 FbxAMatrix getGeometryTransformation(FbxNode* lNode);
-Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header);
+Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header, const char* dir);
 
-void staticMesh(FbxNode* lNode, GRP4Header& header, const char* name);
-void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const char* name);
+void staticMesh(FbxNode* lNode, GRP4Header& header, const char* name, const char* dir);
+void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const char* name, const char* dir);
 
 void FbxMat4ToMat4x4(const FbxAMatrix& mat4, Mesh::Matrix4x4& newMat);
 void ProcessSkeleton(FbxNode * pNode, std::vector<Mesh::Joint> & pSkeleton);
@@ -171,7 +176,7 @@ void processJointsAndAnimations(FbxNode * pNode, std::vector<GRP4Header::Animate
 	}
 }
 
-Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header)
+Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header, const char* dir)
 {
 	Mesh::Material meshMaterial = Mesh::Material();
 
@@ -179,20 +184,140 @@ Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header)
 	{
 		FbxSurfaceMaterial* material = (FbxSurfaceMaterial*)lNode->GetSrcObject<FbxSurfaceMaterial>(i);
 		std::string texturRelativePath;
+		std::string normalTexRelativePath;
 		std::string textureName;
+		std::string normMapName;
 
-		if (material)
-		{
+		std::error_code error;
+
+		if (material) {
+
+			for (int k = 0; k < 3; k++) {
+				meshMaterial.diffuse[k] = 0;
+				meshMaterial.emissive[k] = 0;
+				meshMaterial.ambient[k] = 0;
+				meshMaterial.specular[k] = 0;
+				meshMaterial.reflection[k] = 0;
+				meshMaterial.transparantColor[k] = 0;
+			}
+
+			meshMaterial.shininess = 0;
+			meshMaterial.specularFactor = 0;
+			meshMaterial.diffuseFactor = 0;
+			meshMaterial.emissiveFactor = 0;
+			meshMaterial.ambientFactor = 0;
+			meshMaterial.reflectionFactor = 0;
+			meshMaterial.transparencyFactor = 0;
+
+			FbxString shader = material->ShadingModel.Get();
+			//std::cout << shader << std::endl; 
+
+			if (shader == "Lambert") {
+
+				FbxSurfaceLambert* lambert = (FbxSurfaceLambert*)lNode->GetSrcObject<FbxSurfaceLambert>(i);
+
+				FbxDouble3 diffuse = lambert->Diffuse.Get();
+				FbxDouble diffuseFactor = lambert->DiffuseFactor.Get();
+
+				FbxDouble3 emissive = lambert->Emissive.Get();				//incandescence
+				FbxDouble emissiveFactor = lambert->EmissiveFactor.Get();
+
+				FbxDouble3 ambient = lambert->Ambient.Get();
+				FbxDouble ambientFactor = lambert->AmbientFactor.Get();
+
+				FbxDouble3 transparantColor = lambert->TransparentColor.Get();
+				FbxDouble transparancyFactor = lambert->TransparencyFactor.Get();
+
+				for (int k = 0; k < 3; k++) {
+					meshMaterial.diffuse[k] = diffuse[k];
+					meshMaterial.emissive[k] = emissive[k];
+					meshMaterial.ambient[k] = ambient[k];
+					meshMaterial.transparantColor[k] = transparantColor[k];
+				}
+
+				meshMaterial.diffuseFactor = diffuseFactor;
+				meshMaterial.emissiveFactor = emissiveFactor;
+				meshMaterial.ambientFactor = ambientFactor;
+				meshMaterial.transparencyFactor = transparancyFactor;
+
+
+				//std::cout << "Diffuse: "  << meshMaterial.diffuse[0] << " " << meshMaterial.diffuse[1] << " " << meshMaterial.diffuse[2] << std::endl;
+				//std::cout << "Emissive: " << meshMaterial.emissive[0] << " " << meshMaterial.emissive[1] << " " << meshMaterial.emissive[2] << std::endl;
+				//std::cout << "Ambient: "  << meshMaterial.ambient[0] << " " << meshMaterial.ambient[1] << " " << meshMaterial.ambient[2] << std::endl;
+				//std::cout << "TransparantColor: " << meshMaterial.transparantColor[0] << " " << meshMaterial.transparantColor[1] << " " << meshMaterial.transparantColor[2] << std::endl;
+
+				//std::cout << "DiffuseFactor: " << meshMaterial.diffuseFactor << std::endl;
+				//std::cout << "EmissiveFactor: " << meshMaterial.emissiveFactor << std::endl;
+				//std::cout << "AmbientFactor: " << meshMaterial.ambientFactor << std::endl;
+				//std::cout << "TransparencyFactor: " << meshMaterial.transparencyFactor << std::endl;
+
+
+			}
+
+			else if (shader == "Phong") {
+				FbxSurfacePhong* phong = (FbxSurfacePhong*)lNode->GetSrcObject<FbxSurfacePhong>(i);
+
+				FbxDouble3 diffuse = phong->Diffuse.Get();
+				FbxDouble diffuseFactor = phong->DiffuseFactor.Get();
+
+				FbxDouble3 ambient = phong->Ambient.Get();
+				FbxDouble ambientFactor = phong->AmbientFactor.Get();
+
+				FbxDouble3 specular = phong->Specular.Get();
+				FbxDouble specularFactor = phong->SpecularFactor.Get();
+
+				FbxDouble shininess = phong->Shininess.Get();
+
+				FbxDouble3 reflection = phong->Reflection.Get();
+				FbxDouble reflectionFactor = phong->ReflectionFactor.Get();
+
+				for (int k = 0; k < 3; k++) {
+					meshMaterial.diffuse[k] = diffuse[k];
+					meshMaterial.ambient[k] = ambient[k];
+					meshMaterial.specular[k] = specular[k];
+					meshMaterial.reflection[k] = reflection[k];
+				}
+
+				meshMaterial.shininess = shininess;
+				meshMaterial.ambientFactor = ambientFactor;
+				meshMaterial.diffuseFactor = diffuseFactor;
+				meshMaterial.specularFactor = specularFactor;
+				meshMaterial.reflectionFactor = reflectionFactor;
+
+
+				//std::cout << "Diffuse: "  << meshMaterial.diffuse[0] << " " << meshMaterial.diffuse[1] << " " << meshMaterial.diffuse[2] << std::endl;
+				//std::cout << "Ambient: "  << meshMaterial.ambient[0] << " " << meshMaterial.ambient[1] << " " << meshMaterial.ambient[2] << std::endl;
+				//std::cout << "Specular: " << meshMaterial.specular[0] << " " << meshMaterial.specular[1] << " " << meshMaterial.specular[2] << std::endl;
+				//std::cout << "Reflection: " << meshMaterial.reflection[0] << " " << meshMaterial.reflection[1] << " " << meshMaterial.reflection[2] << std::endl;
+
+
+				//std::cout << "Shininess: " << meshMaterial.shininess << std::endl;
+				//std::cout << "DiffuseFactor: " << meshMaterial.diffuseFactor << std::endl;
+				//std::cout << "AmbientFactor: " << meshMaterial.ambientFactor << std::endl;
+				//std::cout << "SpecularFactor: " << meshMaterial.specularFactor << std::endl;
+				//std::cout << "ReflectionFactor: " << meshMaterial.reflectionFactor << std::endl;
+
+			}
+
+			// Get Texture ======================
 			FbxProperty diffuse = material->FindProperty(FbxSurfaceMaterial::sDiffuse);
-
-			// Directly get textures
 			int textureCount = diffuse.GetSrcObjectCount<FbxTexture>();
+
 			for (int j = 0; j < textureCount; j++)
 			{
 				const FbxFileTexture* texture = FbxCast<FbxFileTexture>(diffuse.GetSrcObject<FbxTexture>(j));
+
 				// Then, you can get all the properties of the texture, include its name
 				texturRelativePath = texture->GetRelativeFileName();
 				size_t endPathPos = texturRelativePath.find_last_of("\\");
+
+				fs::copy(texturRelativePath, dir, error);
+
+				if (error.value() != 0) {
+					std::cout << "Texture could not be copied" << std::endl;
+				}
+
+
 				if (endPathPos != std::string::npos)
 				{
 					textureName = texturRelativePath.substr(endPathPos + 1);
@@ -201,20 +326,31 @@ Mesh::Material getMaterial(FbxNode* lNode, GRP4Header& header)
 				}
 			}
 
-			FbxProperty bump = material->FindProperty(FbxSurfaceMaterial::sBump);
 
-			// Directly get textures
+			// Get Normal Map ==================
+			FbxProperty bump = material->FindProperty(FbxSurfaceMaterial::sBump);
 			textureCount = bump.GetSrcObjectCount<FbxTexture>();
+
 			for (int j = 0; j < textureCount; j++)
 			{
 				const FbxFileTexture* texture = FbxCast<FbxFileTexture>(bump.GetSrcObject<FbxTexture>(j));
+
 				// Then, you can get all the properties of the texture, include its name
-				texturRelativePath = texture->GetRelativeFileName();
-				size_t endPathPos = texturRelativePath.find_last_of("\\");
+				normalTexRelativePath = texture->GetRelativeFileName();
+				size_t endPathPos = normalTexRelativePath.find_last_of("\\");
+
+
+				fs::copy(normalTexRelativePath, dir, error);
+
+				if (error.value() != 0) {
+					std::cout << "Normalmap could not be copied" << std::endl;
+				}
+
+
 				if (endPathPos != std::string::npos)
 				{
-					textureName = texturRelativePath.substr(endPathPos + 1);
-					_snprintf_s(meshMaterial.normalTexture, sizeof(meshMaterial.normalTexture), textureName.c_str());
+					normMapName = normalTexRelativePath.substr(endPathPos + 1);
+					_snprintf_s(meshMaterial.normalTexture, sizeof(meshMaterial.normalTexture), normMapName.c_str());
 					std::cout << "Normal texture: " << meshMaterial.normalTexture << std::endl;
 				}
 			}
@@ -238,7 +374,7 @@ FbxAMatrix getGeometryTransformation(FbxNode* lNode)
 	return FbxAMatrix(lT, lR, lS);
 }
 
-void staticMesh(FbxNode* lNode, GRP4Header& header, const char* name)
+void staticMesh(FbxNode* lNode, GRP4Header& header, const char* name, const char* dir)
 {
 	StaticMesh tempMesh;
 
@@ -316,18 +452,18 @@ void staticMesh(FbxNode* lNode, GRP4Header& header, const char* name)
 		}
 	}
 
-	tempMesh.SetMeshMaterial(getMaterial(lNode, header));
+	tempMesh.SetMeshMaterial(getMaterial(lNode, header, dir));
 	header.CreateStaticModel(name, 0, tempMesh.verticies, tempMesh.indices, tempMesh.material);
 
 }
 
-void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const char* name)
+void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const char* name, const char* dir)
 {
 	AnimatedMesh tempMesh;
-	//StaticMesh* tempMesh;
 	GRP4Header::ModelDataHeader mDataHeader;
 
 	mDataHeader.animatedMeshCount = 1;
+
 	// Use node to get information about mesh
 	FbxMesh* lMesh = lNode->GetMesh();
 	FbxVector4* lVertexArray = lMesh->GetControlPoints();
@@ -336,11 +472,11 @@ void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const ch
 	FbxGeometryElementBinormal* lBiNormal = lMesh->GetElementBinormal();
 	FbxGeometryElementUV* lVertUV = lMesh->GetElementUV();
 
-	//vector<Mesh::AnimatedVertex> verts;
 	vector<GRP4Header::AnimatedMeshControlPoint> meshCtrlPoints;
 
 	cout << "Vertices: " << lMesh->GetControlPointsCount() << endl;
 	cout << "Triangles: " << lMesh->GetPolygonCount() << endl;
+
 	for (int i = 0; i < lMesh->GetControlPointsCount(); i++)
 	{
 		GRP4Header::AnimatedMeshControlPoint ctrlPoint;
@@ -420,10 +556,10 @@ void animatedMesh(FbxNode* lNode, GRP4Header& header, FbxScene* lScene, const ch
 
 	}
 
-	tempMesh.SetAnimatedMeshMaterial(getMaterial(lNode, header));
+	tempMesh.SetAnimatedMeshMaterial(getMaterial(lNode, header, dir));
 
 	header.CreateAnimatedModel(name, 0, tempMesh.verticies,
-		tempMesh.indicies, tempMesh.animatedMaterial, tempMesh.skeleton, tempMesh.animations,
+		tempMesh.indicies, tempMesh.materials, tempMesh.skeleton, tempMesh.animations,
 		tempMesh.keyframes);
 }
 
@@ -449,7 +585,7 @@ void ProcessSkeletonRecursively(FbxNode * pNode, int pParentIndex, std::vector<M
 		pSkeleton.push_back(currentJoint);
 		/*std::cout << "Joint: " << currentJoint.name << " | Parent: " << std::to_string(currentJoint.parentIndex)
 		<< " | Myself: " << std::to_string(currentJoint.index) << std::endl;*/
-	 }
+	}
 	for (int i = 0; i < pNode->GetChildCount(); i++)
 	{
 		ProcessSkeletonRecursively(pNode->GetChild(i), pSkeleton.size() - 1, pSkeleton);
@@ -488,27 +624,46 @@ bool CheckIfNodeHasSkeleton(FbxNode* pNode)
 // =====================================================================
 
 
-int main(int argc, char* argv[]) {
-
-	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
+int main(int arcg, const char* argv[4])
+{
 	/*
 	BEFORE USING:
-	- remember to triangulate mesh
-	- freeze transformations on meshes
-
+	- delete non-deformer history!
+	- (remember to triangulate mesh)
+	- freeze transformations on meshes!
+	- if mesh with skeleton: mesh needs to be above skeleton!
+	- if using texture, the texture needs to be in another directory than the mesh when applied in maya!
 	*/
+
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	CustomFileLoader importr;
 	GRP4Header header;
 
-	const char* fileName = "barrel2.fbx";
-	const char* filePath = "Materials/barrel2.fbx";
-	const char* newName = "barrel.vkp"; 
 
+	/*char directory[200] = "";
+	const char* dir = "C:/Users/Eva/source/repos/Importer-Exporter/FBXConverter/FBXConverter/Test/";
+	const char* fileName = "island.fbx";
+	const char* newName = "island.vkp";
 	bool isTriangulated = true;
 
+	strcat_s(directory, dir);
+	strcat_s(directory, fileName);*/
+
+	char directory[200] = "";
+	const char* dir = "C:/Users/Eva/source/repos/Importer-Exporter/FBXConverter/FBXConverter/Test/";
+	const char* fileName = argv[1];
+	const char* newName = argv[2];
+	bool isTriangulated = argv[3];
+
+	strcat_s(directory, dir);
+	strcat_s(directory, fileName);
+
+	// ==============================================
+	//create SDKManager
 	FbxManager* lSDKManager = FbxManager::Create();
 
+	//create IOSettings object
 	FbxIOSettings *ios = FbxIOSettings::Create(lSDKManager, IOSROOT);
 	lSDKManager->SetIOSettings(ios);
 
@@ -516,75 +671,82 @@ int main(int argc, char* argv[]) {
 	FbxImporter* lImporter = FbxImporter::Create(lSDKManager, "");
 
 	// Use the first argument as the filename for the importer.
-	if (!lImporter->Initialize(filePath, -1, lSDKManager->GetIOSettings())) {
+	if (!lImporter->Initialize(directory, -1, lSDKManager->GetIOSettings())) {
 
 		std::cout << "Call to FbxImporter::Initialize() failed" << std::endl;
-		std::cout << lImporter->GetStatus().GetErrorString() << std::endl; 
-		getchar(); 
-		exit(-1);
+		std::cout << "Error " << lImporter->GetStatus().GetErrorString() << std::endl;
+		lSDKManager->Destroy();
+
+		getchar();
+		//exit(-1) gives memory leak message
+		return -1;
 	}
 
-	// Create a new scene so that it can be populated by the imported file.
-	FbxScene* lScene = FbxScene::Create(lSDKManager, "myScene");
-	// Import the contents of the file into the scene.
-	lImporter->Import(lScene);
-	// The file is imported, so get rid of the importer.
-	lImporter->Destroy();
+	else {
+		// Create a new scene so that it can be populated by the imported file.
+		FbxScene* lScene = FbxScene::Create(lSDKManager, "myScene");
 
+		// Import the contents of the file into the scene.
+		lImporter->Import(lScene);
 
-	if (isTriangulated == false) {
+		// The file is imported, so get rid of the importer.
+		lImporter->Destroy();
 
-		FbxGeometryConverter lGeomConverter(lSDKManager);
-		lGeomConverter.Triangulate(lScene, true, false);
-	}
+		if (isTriangulated == false) {
 
-	// Find mesh vertices and print information about them
-	// Get the scenes root node
-	FbxNode* lRootNode = lScene->GetRootNode();
+			FbxGeometryConverter lGeomConverter(lSDKManager);
+			lGeomConverter.Triangulate(lScene, true, false);
+		}
 
-	// Use root node to find children
-	FbxNode* lNode = lRootNode->GetChild(0);
-	int childCount = lRootNode->GetChildCount();
+		// Find mesh vertices and print information about them
+		// Get the scenes root node
+		FbxNode* lRootNode = lScene->GetRootNode();
 
-	if (lRootNode) {
-		for (int i = 0; i < childCount; i++) {
+		// Use root node to find children
+		FbxNode* lNode = lRootNode->GetChild(0);
+		int childCount = lRootNode->GetChildCount();
 
-			FbxNode* lNode = lRootNode->GetChild(i);
-			FbxNodeAttribute * nodeAttribute = lNode->GetNodeAttribute();
+		if (lRootNode) {
+			for (int i = 0; i < childCount; i++) {
 
-			if (nodeAttribute && nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
-			{
-				if (CheckIfNodeHasSkeleton(lNode->GetParent()))
+				FbxNode* lNode = lRootNode->GetChild(i);
+				FbxNodeAttribute * nodeAttribute = lNode->GetNodeAttribute();
+
+				if (nodeAttribute && nodeAttribute->GetAttributeType() == FbxNodeAttribute::eMesh)
 				{
-					std::cout << "Animated mesh" << std::endl;
-					animatedMesh(lNode, header, lScene, fileName);
+					if (CheckIfNodeHasSkeleton(lNode->GetParent()))
+					{
+						std::cout << "Animated mesh" << std::endl;
+						animatedMesh(lNode, header, lScene, fileName, dir);
+						std::cout << std::endl;
+						//std::cout << "Animation name: " << header.animatedMesh[0].animations[0].animationName << std::endl; 
+					}
 
-					std::cout << "Anim name: " << header.animatedMesh[0].animations[0].animationName << std::endl; 
-				}
+					else
+					{
+						std::cout << "Static mesh" << std::endl;
+						staticMesh(lNode, header, fileName, dir);
+						std::cout << std::endl;
 
-				else
-				{
-					std::cout << "Static mesh" << std::endl;
-					std::cout << std::endl;
-					staticMesh(lNode, header, fileName);
+					}
 				}
 			}
 		}
 
+		memset(directory, 0, 100);
+		strcat_s(directory, dir);
+		strcat_s(directory, newName);
+
+		importr.SaveToFile(directory, header);
+
+		std::cout << std::endl;
+		std::cout << "File was saved" << std::endl;
+
+		//ios->Destroy(); 
+		// Destroy the SDK manager and all the other objects it was handling.
+		lSDKManager->Destroy();
 	}
 
 
-	importr.SaveToFile(newName, header);
-
-	std::cout << "File was saved" << std::endl;
-
-	// Destroy the SDK manager and all the other objects it was handling.
-	lSDKManager->Destroy();	struct VertexBlendingInfo {
-		float blendingWeight;
-		unsigned int blendingIndex;
-	};
-
-
-	getchar();
 	return 0;
 }
