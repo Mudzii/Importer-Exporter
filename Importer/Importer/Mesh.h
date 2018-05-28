@@ -3,7 +3,7 @@
 
 class Mesh {
 
-public: 
+public:
 	struct Matrix4x4
 	{
 		float column1[4];
@@ -26,13 +26,13 @@ public:
 		float UV[2];
 		float tangent[3];
 		float bitangent[3];
-		int boneIndicies[4]; 
+		int boneIndicies[4];
 		float boneWeight[4];
 	};
 
 
 	struct Joint {
-		char boneName[50]; 
+		char boneName[50];
 		int parentIndex;
 		unsigned int jointIndex;
 		/*float rotation[4];
@@ -43,20 +43,33 @@ public:
 	struct Animation {
 		char animationName[50];
 		unsigned int animationIndex;
-		unsigned int nrOfFrames; 
+		unsigned int nrOfFrames;
 	};
 
 	struct Material {
-		//float diffuse[4];
-		//float specular[4];
 		char diffuseTexture[50];
 		char normalTexture[50];
-		//char specularTexture[50];
+
+		//lambert
+		float diffuse[3];
+		float ambient[3];
+		float emissive[3];
+		float transparantColor[3];
+
+		float diffuseFactor;
+		float emissiveFactor;
+		float ambientFactor;
+		float transparencyFactor;
+
+		//phong
+		float specular[3];
+		float reflection[3];
+
+		float shininess;
+		float specularFactor;
+		float reflectionFactor;
 	};
 
 };
-
-
-
 
 #endif

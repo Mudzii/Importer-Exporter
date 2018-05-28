@@ -19,34 +19,34 @@ public:
 	std::vector<Animation> animations;
 	std::vector<std::vector<std::vector<Matrix4x4>>> keyframes;
 	std::vector<Matrix4x4> keyframesPackedData;
-	Material animatedMaterial;
+
 
 public:
 	AnimatedMesh(std::string animatedMeshName, int animatedMeshIndex, const std::vector<Mesh::AnimatedVertex>& vertices,
 		const std::vector<unsigned int>& indices, Mesh::Material materials, const std::vector<Mesh::Joint> skeleton, const std::vector<Mesh::Animation> animations,
 		const std::vector<std::vector<std::vector<Mesh::Matrix4x4>>> &keyframes);
 	~AnimatedMesh();
-	AnimatedMesh(); 
+	AnimatedMesh();
 
 	// =============
 
 	int GetAnimatedMeshIndex();
 
-	int GetKeyframeCount(); 
-	int GetAnimationCount(); 
-	int GetAnimatedJointCount(); 
+	int GetKeyframeCount();
+	int GetAnimationCount();
+	int GetAnimatedJointCount();
 	int GetAnimatedIndexCount();
 	int GetAnimatedVertexCount();
 
 
 	std::string GetAnimatedMeshName();
-	Material GetAnimatedMeshMaterial(); 
-	std::vector<Animation> GetAnimations(); 
-	std::vector<Joint> GetAnimatedMeshJoints(); 
+	Material GetAnimatedMeshMaterial();
+	std::vector<Animation> GetAnimations();
+	std::vector<Joint> GetAnimatedMeshJoints();
 	std::vector<unsigned int> GetAnimatedIndices();
 	std::vector<AnimatedVertex> GetAnimatedVerticies();
 	std::vector<std::vector<std::vector<Matrix4x4>>> GetKeyframes();
-	std::vector<Mesh::Matrix4x4> GetKeyframesPacked(); 
+	std::vector<Mesh::Matrix4x4> GetKeyframesPacked();
 
 	// =============
 
@@ -56,7 +56,7 @@ public:
 	// =============
 
 	void SetAnimatedMeshName(std::string animatedMeshName);
-	void SetAnimatedMeshMaterial(Material animatedMaterial);
+	void SetAnimatedMeshMaterial(Material materials);
 	void SetAnimatedMeshIndex(unsigned int animatedMeshIndex);
 
 };

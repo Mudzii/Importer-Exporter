@@ -2,19 +2,19 @@
 
 StaticMesh::StaticMesh(std::string meshName, int staticMeshIndex, const std::vector<StaticVertex> &vertices,
 	const std::vector<unsigned int> &indices, Material material) {
-	
-	this->meshName	= meshName; 
-	this->staticMeshIndex = staticMeshIndex; 
 
-	this->indices   = indices; 
+	this->meshName = meshName;
+	this->staticMeshIndex = staticMeshIndex;
+
+	this->indices = indices;
 	this->verticies = vertices;
-	this->material  = material; 
+	this->material = material;
 
 }
 
 StaticMesh::StaticMesh()
 {
-	this->meshName = ""; 
+	this->meshName = "";
 	this->staticMeshIndex = 0;
 
 }
@@ -30,24 +30,24 @@ int StaticMesh::GetMeshIndex() {
 }
 
 int StaticMesh::GetVertexCount() {
-	return this->verticies.size(); 
+	return this->verticies.size();
 }
 
 std::string StaticMesh::GetMeshName() {
-	return this->meshName; 
+	return this->meshName;
 }
 
 Mesh::Material StaticMesh::GetMaterial() {
-	return this->material; 
+	return this->material;
 }
 
 unsigned int StaticMesh::GetIndexCount() {
-	return this->indices.size(); 
+	return this->indices.size();
 }
 
 
 std::vector<unsigned int> StaticMesh::GetIndices() {
-	return this->indices; 
+	return this->indices;
 }
 
 std::vector<Mesh::StaticVertex> StaticMesh::GetVerticies() {
@@ -61,7 +61,7 @@ void StaticMesh::SetMeshIndex(int meshIndex) {
 }
 
 void StaticMesh::SetMeshName(std::string meshName) {
-	this->meshName = meshName; 
+	this->meshName = meshName;
 }
 
 void StaticMesh::SetMeshMaterial(Material material) {
@@ -73,14 +73,14 @@ void StaticMesh::SetIndices(std::vector<unsigned int> indices) {
 }
 
 void StaticMesh::SetVertices(std::vector<StaticVertex> verticies) {
-	this->verticies = verticies; 
+	this->verticies = verticies;
 }
 
 
 void StaticMesh::PushBackIndice(unsigned int indice) {
-	this->indices.push_back(indice); 
+	this->indices.push_back(indice);
 }
 
 void StaticMesh::PushBackVertex(StaticVertex vertex) {
-	this->verticies.push_back(vertex); 
+	this->verticies.push_back(vertex);
 }

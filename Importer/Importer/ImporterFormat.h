@@ -12,7 +12,7 @@
 
 // HEADER ==========================================================
 class GRP4Header {
-public: 
+public:
 
 	struct VertexBlendingInfo {
 		float blendingWeight;
@@ -55,50 +55,50 @@ public:
 	friend class CustomFileLoader;
 
 
-	char buff[255]; 
+	char buff[255];
 	int meshNameLength;
 	std::vector<StaticMesh> staticMesh;
 	std::vector<AnimatedMesh> animatedMesh;
 
 public:
-	GRP4Header(); 
-	~GRP4Header(); 
+	GRP4Header();
+	~GRP4Header();
 
 	void CleanUp();
 
 	// STATIC MESH ============= 
-	int GetNrOfStaticMeshes(); 
-	int GetStaticMeshIndex(int index); 
+	int GetNrOfStaticMeshes();
+	int GetStaticMeshIndex(int index);
 
 	int GetNrOfIndicesForStaticMesh(int meshIndex);
-	int GetNrOfVerticiesForStaticMesh(int meshIndex); 
+	int GetNrOfVerticiesForStaticMesh(int meshIndex);
 
 	std::string GetMeshNameForStaticMesh(int meshIndex);
 	Mesh::Material GetMaterialForStaticMesh(int meshIndex);
-	
-	std::vector<unsigned int> GetIndicesForStaticMesh(int meshIndex); 
+
+	std::vector<unsigned int> GetIndicesForStaticMesh(int meshIndex);
 	std::vector<Mesh::StaticVertex> GetVerticiesForStaticMesh(int meshIndex);
 
 
 	void CreateStaticModel(std::string meshName, int staticMeshIndex, const std::vector<Mesh::StaticVertex> &vertices,
-						 const std::vector<unsigned int> &indices, Mesh::Material material);
+		const std::vector<unsigned int> &indices, Mesh::Material material);
 
 
 	// ANIMATED MESH =========== 
-	int GetNrOfAnimatedMeshes(); 
-	int GetAnimatedMeshIndex(int index); 
-	int GetNrOfVerticesForAnimatedMesh(int meshIndex); 
+	int GetNrOfAnimatedMeshes();
+	int GetAnimatedMeshIndex(int index);
+	int GetNrOfVerticesForAnimatedMesh(int meshIndex);
 
 	std::string GetMeshNameForAnimatedMesh(int meshIndex);
-	Mesh::Material GetMaterialForAnimatedMesh(int meshIndex); 
+	Mesh::Material GetMaterialForAnimatedMesh(int meshIndex);
 
-	std::vector<unsigned int> GetIndicesForAnimatedMesh(int meshIndex); 
-	std::vector<Mesh::Joint> GetSkeletonForAnimatedMesh(int meshIndex); 
-	std::vector<Mesh::Animation> GetAnimationsForAnimatedMesh(int meshIndex); 
-	std::vector<Mesh::AnimatedVertex> GetVerticesForAnimatedMesh(int meshIndex); 
-	std::vector<Mesh::Matrix4x4> GetKeyframesPackedForAnimatedMesh(int meshIndex); 
-	std::vector<std::vector<std::vector<Mesh::Matrix4x4>>> GetKeyframesForAnimatedMesh(int meshIndex); 
-	
+	std::vector<unsigned int> GetIndicesForAnimatedMesh(int meshIndex);
+	std::vector<Mesh::Joint> GetSkeletonForAnimatedMesh(int meshIndex);
+	std::vector<Mesh::Animation> GetAnimationsForAnimatedMesh(int meshIndex);
+	std::vector<Mesh::AnimatedVertex> GetVerticesForAnimatedMesh(int meshIndex);
+	std::vector<Mesh::Matrix4x4> GetKeyframesPackedForAnimatedMesh(int meshIndex);
+	std::vector<std::vector<std::vector<Mesh::Matrix4x4>>> GetKeyframesForAnimatedMesh(int meshIndex);
+
 	int FindJointIndexByName(const char* pName, std::vector<Mesh::Joint> & pSkeleton);
 
 	void CreateAnimatedModel(std::string animatedMeshName, int animatedMeshIndex, const std::vector<Mesh::AnimatedVertex> &vertices,
