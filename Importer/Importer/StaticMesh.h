@@ -1,6 +1,6 @@
 #ifndef STATICMESH_H
 #define STATICMESH_H
-
+// Daniel was here
 #include <stdio.h>
 #include <vector>
 #include <fstream>
